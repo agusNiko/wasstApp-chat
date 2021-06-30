@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
+import Image from "./Background-Image.png";
 
 export default class Start extends React.Component {
   constructor(props) {
@@ -71,15 +72,13 @@ export default class Start extends React.Component {
       },
     });
 
-    const image = { uri: "https://reactjs.org/logo-og.png" };
     return (
       <ImageBackground
-        source={image}
+        source={Image}
         style={{
           flex: 1,
           resizeMode: "cover",
           justifyContent: "center",
-          width: "100%",
         }}
       >
         <View style={[styles.container]}>
