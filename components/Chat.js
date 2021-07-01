@@ -24,7 +24,7 @@ export default class Chat extends React.Component {
       messages: [
         {
           _id: 1,
-          text: "Hello developer " + name,
+          text: "Hello developer ",
           createdAt: new Date(),
           user: {
             _id: 2,
@@ -64,10 +64,11 @@ export default class Chat extends React.Component {
 
   render() {
     let chatColor = this.props.route.params.color;
+
     return (
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : null}
-        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? null : null}
+        style={{ flex: 1, justifyContent: "flex-end" }}
       >
         <GiftedChat
           listViewProps={{
