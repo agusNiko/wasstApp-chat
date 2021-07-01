@@ -21,164 +21,152 @@ export default class Start extends React.Component {
     const styles = StyleSheet.create({
       container: {
         flex: 1,
-        justifyContent: "center",
-        padding: "6%",
       },
-      startViewUp: {
-        flex: 56,
-        //backgroundColor: "red",
-        // justifyContent: "center",
-        alignItems: "center",
+      inner: {
+        padding: 24,
+        flex: 1,
+        justifyContent: "flex-end",
       },
-      appTitle: {
+      header: {
         fontSize: 45,
         fontWeight: "600",
         color: "#FFFFFF",
+        marginBottom: "40%",
+        marginTop: "30%",
+        textAlign: "center",
       },
-      startViewDown: {
-        flex: 44,
+      input: {
+        height: 40,
+        borderColor: "#000000",
+        borderBottomWidth: 1,
+        marginBottom: 0,
         backgroundColor: "white",
-        justifyContent: "space-around",
-        alignItems: "center",
-      },
-      textInput: {
-        borderColor: "gray",
-        borderWidth: 1,
-        backgroundColor: "white",
-        width: "88%",
-        height: "20%",
+        padding: 10,
         fontWeight: "300",
         color: "#757083",
         opacity: 0.5,
-
-        //“Your name”: font size 16, font weight 300, font color #757083, 50% opacity
+      },
+      btnContainer: {
+        backgroundColor: "white",
+        marginTop: 12,
+        justifyContent: "space-evenly",
+        padding: 10,
+      },
+      backgroundPhoto: {
+        flex: 1,
+        resizeMode: "cover",
+        justifyContent: "center",
+      },
+      backgroundColors: {
+        marginTop: 30,
+        marginBottom: 30,
+        flexDirection: "row",
+        backgroundColor: "white",
+        justifyContent: "space-around",
       },
       startChatButton: {
         borderWidth: 50,
         fontWeight: "600",
         color: "#FFFFFF",
         backgroundColor: "#757083",
-      },
-
-      backgroundColors: {
-        width: "88%",
-        height: "20%",
-        flexDirection: "row",
-        justifyContent: "space-around",
-      },
-      image: {
-        flex: 1,
-        resizeMode: "cover",
-        justifyContent: "center",
+        marginBottom: 20,
       },
     });
 
     return (
       <KeyboardAvoidingView
-        behavior={Platform.OS === "android" ? "height" : null}
+        behavior={Platform.OS === "ios" ? "padding" : null}
         style={{ flex: 1 }}
       >
-        <ImageBackground
-          source={Image}
-          style={{
-            flex: 1,
-            resizeMode: "cover",
-            justifyContent: "center",
-          }}
-        >
-          <View style={[styles.container]}>
-            <View style={styles.startViewUp}>
-              <Text style={styles.appTitle}>WassApp!</Text>
-            </View>
-            <View style={styles.startViewDown}>
-              <TextInput
-                style={styles.textInput}
-                onChangeText={(name) => this.setState({ name })} // on change state.name is modified.
-                value={this.state.name}
-                placeholder="Type here ..."
-              />
+        <ImageBackground source={Image} style={styles.backgroundPhoto}>
+          <View style={styles.container}>
+            <View style={styles.inner}>
+              <Text style={styles.header}>WassApp!</Text>
+              <View style={styles.btnContainer}>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={(name) => this.setState({ name })} // on change state.name is modified.
+                  value={this.state.name}
+                  placeholder="Type your name..."
+                />
+                {/* <TextInput placeholder="Password" style={styles.input} />
+              <TextInput placeholder="Confrim Password" style={styles.input} /> */}
 
-              <View style={styles.backgroundColors}>
-                <View
-                  style={{
-                    borderColor: "red",
-                    height: 55,
-                    width: 55,
-                    borderWidth: 3,
-                    borderRadius: 100,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
+                <View style={styles.backgroundColors}>
+                  <View
+                    style={{
+                      borderColor: "red",
+                      height: 55,
+                      width: 55,
+                      borderWidth: 3,
+                      borderRadius: 100,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <TouchableOpacity
+                      className="colorButton1"
+                      style={{
+                        height: 50,
+                        width: 50,
+                        borderRadius: 100,
+                        borderWidth: 1,
+                        backgroundColor: "#090C08",
+                      }}
+                      onPress={() => {
+                        this.setState({ color: "#090C08" });
+                      }}
+                    >
+                      <View style={{ height: 50, width: 50 }} />
+                    </TouchableOpacity>
+                  </View>
                   <TouchableOpacity
-                    className="colorButton1"
+                    className="colorButton2"
                     style={{
                       height: 50,
                       width: 50,
                       borderRadius: 100,
                       borderWidth: 1,
-                      backgroundColor: "#090C08",
+                      backgroundColor: "#474056",
                     }}
                     onPress={() => {
-                      this.setState({ color: "#090C08" });
+                      this.setState({ color: "#474056" });
+                    }}
+                  >
+                    <View style={{ height: 50, width: 50 }} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className="colorButton3"
+                    style={{
+                      height: 50,
+                      width: 50,
+                      borderRadius: 100,
+
+                      backgroundColor: "#8A95A5",
+                    }}
+                    onPress={() => {
+                      this.setState({ color: "#8A95A5" });
+                    }}
+                  >
+                    <View style={{ height: 50, width: 50 }} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className="colorButton4"
+                    style={{
+                      height: 50,
+                      width: 50,
+                      borderRadius: 100,
+
+                      backgroundColor: "#B9C6AE",
+                    }}
+                    onPress={() => {
+                      this.setState({ color: "#B9C6AE" });
                     }}
                   >
                     <View style={{ height: 50, width: 50 }} />
                   </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  className="colorButton2"
-                  style={{
-                    height: 50,
-                    width: 50,
-                    borderRadius: 100,
-                    borderWidth: 1,
-                    backgroundColor: "#474056",
-                  }}
-                  onPress={() => {
-                    this.setState({ color: "#474056" });
-                  }}
-                >
-                  <View style={{ height: 50, width: 50 }} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="colorButton3"
-                  style={{
-                    height: 50,
-                    width: 50,
-                    borderRadius: 100,
 
-                    backgroundColor: "#8A95A5",
-                  }}
-                  onPress={() => {
-                    this.setState({ color: "#8A95A5" });
-                  }}
-                >
-                  <View style={{ height: 50, width: 50 }} />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="colorButton4"
-                  style={{
-                    height: 50,
-                    width: 50,
-                    borderRadius: 100,
-
-                    backgroundColor: "#B9C6AE",
-                  }}
-                  onPress={() => {
-                    this.setState({ color: "#B9C6AE" });
-                  }}
-                >
-                  <View style={{ height: 50, width: 50 }} />
-                </TouchableOpacity>
-              </View>
-
-              <TouchableOpacity
-                style={{
-                  width: "88%",
-                }}
-              >
-                {/* here touchableOpacity allows me to increase the size of the button */}
                 <Button
                   style={styles.startChatButton}
                   title="Start Chatting"
@@ -190,7 +178,8 @@ export default class Start extends React.Component {
                       }) //this code navigate to Chat screen and send name as a props
                   }
                 />
-              </TouchableOpacity>
+              </View>
+              <View style={{ flex: 1 }} />
             </View>
           </View>
         </ImageBackground>
