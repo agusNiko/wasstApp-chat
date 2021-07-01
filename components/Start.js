@@ -32,7 +32,7 @@ export default class Start extends React.Component {
         fontSize: 45,
         fontWeight: "600",
         color: "#FFFFFF",
-        marginBottom: "40%",
+        marginBottom: "60%",
         marginTop: "30%",
         textAlign: "center",
       },
