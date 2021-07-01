@@ -4,6 +4,7 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   Platform,
+  Text,
 } from "react-native";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 
@@ -16,6 +17,8 @@ export default class Chat extends React.Component {
   }
   componentDidMount() {
     let name = this.props.route.params.name;
+    this.props.navigation.setOptions({ title: "Hi " + name });
+
     this.setState({
       messages: [
         {
@@ -35,6 +38,7 @@ export default class Chat extends React.Component {
           system: true,
         },
       ],
+      name: name,
     });
   }
 
@@ -58,19 +62,16 @@ export default class Chat extends React.Component {
   }
 
   render() {
-    let name = this.props.route.params.name;
     let chatColor = this.props.route.params.color;
-    this.props.navigation.setOptions({ title: "Hi " + name });
-
     return (
       <KeyboardAvoidingView
-        behavior={Platform.OS === "android" ? "height" : null}
+        behavior={Platform.OS === "ios" ? "padding" : null}
         style={{ flex: 1 }}
       >
         <GiftedChat
           listViewProps={{
             style: {
-              backgroundColor: chatColor,
+              backgroundColor: { chatColor },
             },
           }} // listVieProps allows me to change the color background of the GiftedChat
           renderBubble={this.renderBubble.bind(this)} //changes the color of the chat bubble
