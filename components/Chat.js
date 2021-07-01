@@ -1,5 +1,10 @@
 import React from "react";
-import { View, ImageBackground, KeyboardAvoidingView } from "react-native";
+import {
+  View,
+  ImageBackground,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 
 export default class Chat extends React.Component {
@@ -58,23 +63,24 @@ export default class Chat extends React.Component {
     this.props.navigation.setOptions({ title: "Hi " + name });
 
     return (
-      //<View Style={{ flex: 1 }}>
-      <GiftedChat
-        listViewProps={{
-          style: {
-            backgroundColor: chatColor,
-          },
-        }} // listVieProps allows me to change the color background of the GiftedChat
-        renderBubble={this.renderBubble.bind(this)} //changes the color of the chat bubble
-        messages={this.state.messages}
-        onSend={(messages) => this.onSend(messages)}
-        user={{
-          _id: 1,
-        }}
-      />
-      //   { Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null //KeybooardAvoidingView behavior="" doesn't work
-      // }
-      //  </View> // If I add a view in as a parent of the GiftedChat, this last does not render
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "android" ? "height" : null}
+        style={{ flex: 1 }}
+      >
+        <GiftedChat
+          listViewProps={{
+            style: {
+              backgroundColor: chatColor,
+            },
+          }} // listVieProps allows me to change the color background of the GiftedChat
+          renderBubble={this.renderBubble.bind(this)} //changes the color of the chat bubble
+          messages={this.state.messages}
+          onSend={(messages) => this.onSend(messages)}
+          user={{
+            _id: 1,
+          }}
+        />
+      </KeyboardAvoidingView> // If I add a view in as a parent of the GiftedChat, this last does not render
     );
   }
 }
