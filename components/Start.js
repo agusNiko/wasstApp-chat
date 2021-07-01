@@ -90,9 +90,6 @@ export default class Start extends React.Component {
                   value={this.state.name}
                   placeholder="Type your name..."
                 />
-                {/* <TextInput placeholder="Password" style={styles.input} />
-              <TextInput placeholder="Confrim Password" style={styles.input} /> */}
-
                 <View style={styles.backgroundColors}>
                   <View
                     style={{

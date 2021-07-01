@@ -17,6 +17,7 @@ export default class Chat extends React.Component {
   }
   componentDidMount() {
     let name = this.props.route.params.name;
+
     this.props.navigation.setOptions({ title: "Hi " + name });
 
     this.setState({
@@ -71,7 +72,7 @@ export default class Chat extends React.Component {
         <GiftedChat
           listViewProps={{
             style: {
-              backgroundColor: { chatColor },
+              backgroundColor: chatColor,
             },
           }} // listVieProps allows me to change the color background of the GiftedChat
           renderBubble={this.renderBubble.bind(this)} //changes the color of the chat bubble
