@@ -5,8 +5,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Text,
+  FlatList,
 } from "react-native";
+
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
+
+import firebase from "firebase"; //import firebase to fetch the data from firebase Database
+import firestore from "firebase";
 
 export default class Chat extends React.Component {
   constructor(props) {
@@ -14,39 +19,87 @@ export default class Chat extends React.Component {
     this.state = {
       messages: [],
     };
+    if (!firebase.apps.length) {
+      // firebase credentials
+      firebase.initializeApp({
+        apiKey: "AIzaSyDVhtwqCNodsAc_gtmz6LdJqA7UN055OOw",
+        authDomain: "wassapp-a2a81.firebaseapp.com",
+        projectId: "wassapp-a2a81",
+        storageBucket: "wassapp-a2a81.appspot.com",
+        messagingSenderId: "415663943591",
+        appId: "1:415663943591:web:61e693157a8bc694891082",
+        measurementId: "G-8LK4E71NEF",
+      });
+    }
+
+    this.referenceChatMessages = firebase.firestore().collection("messages"); // fetches the data from the collection "messages", this.referenceChatMessages will receive the data and updates of the database
   }
+
   componentDidMount() {
     let name = this.props.route.params.name;
 
     this.props.navigation.setOptions({ title: "Hi " + name });
 
-    this.setState({
-      messages: [
-        {
-          _id: 1,
-          text: "Hello developer ",
-          createdAt: new Date(),
-          user: {
-            _id: 2,
-            name: "React Native",
-            avatar: "https://placeimg.com/140/140/any",
-          },
-        },
-        {
-          _id: 2,
-          text: "This is a system message",
-          createdAt: new Date(),
-          system: true,
-        },
-      ],
-      name: name,
-    });
+    this.referenceChatMessages = firebase.firestore().collection("messages");
+    this.unsubscribe = this.referenceChatMessages.onSnapshot(
+      this.onCollectionUpdate
+    );
+    // this.setState({
+    //   messages: [
+    //     {
+    //       _id: 1,
+    //       text: "Hello developer ",
+    //       createdAt: new Date(),
+    //       user: {
+    //         _id: 2,
+    //         name: "React Native",
+    //         avatar: "https://placeimg.com/140/140/any",
+    //       },
+    //     },
+    //     {
+    //       _id: 2,
+    //       text: "This is a system message",
+    //       createdAt: new Date(),
+    //       system: true,
+    //     },
+    //   ],
+    // });
   }
 
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  sendMessage() {
+    const message = this.state.messages[0];
+    this.referenceChatMessages.add(message);
+  }
+
+  onCollectionUpdate = (querySnapshot) => {
+    const messages = [];
+    // go through each document
+    querySnapshot.forEach((doc) => {
+      // get the QueryDocumentSnapshot's data
+      let data = doc.data();
+      messages.push({
+        _id: data._id,
+        text: data.text,
+        createdAt: data.createdAt.toDate(),
+        user: data.user,
+        system: data.system,
+      });
+    });
+    this.setState({
+      messages,
+    });
+  };
+
   onSend(messages = []) {
-    this.setState((previousState) => ({
-      messages: GiftedChat.append(previousState.messages, messages),
-    }));
+    // this.setState((previousState) => ({
+    //   messages: GiftedChat.append(previousState.messages, messages),
+    // }));
+
+    this.referenceChatMessages.add(messages[0]); // on send add the message[0] to the firebase then it automaticaly will be fetched
   }
 
   renderBubble(props) {
@@ -70,6 +123,14 @@ export default class Chat extends React.Component {
         behavior={Platform.OS === "ios" ? null : null}
         style={{ flex: 1, justifyContent: "flex-end" }}
       >
+        {/* <FlatList
+          data={this.state.messages}
+          renderItem={({ item }) => (
+            <Text>
+              {item._id}: {item.text}
+            </Text>
+          )}
+        /> */}
         <GiftedChat
           listViewProps={{
             style: {
@@ -81,6 +142,8 @@ export default class Chat extends React.Component {
           onSend={(messages) => this.onSend(messages)}
           user={{
             _id: 1,
+            name: "pedro",
+            avatar: "https://placeimg.com/140/140/any",
           }}
         />
       </KeyboardAvoidingView> // If I add a view in as a parent of the GiftedChat, this last does not render
