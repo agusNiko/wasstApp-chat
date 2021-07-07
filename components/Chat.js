@@ -18,6 +18,8 @@ export default class Chat extends React.Component {
     super(props);
     this.state = {
       messages: [],
+      uid: 0,
+      loggedInText: "Please wait, you are getting logged in",
     };
     if (!firebase.apps.length) {
       // firebase credentials
@@ -32,7 +34,7 @@ export default class Chat extends React.Component {
       });
     }
 
-    //this.referenceChatMessages = firebase.firestore().collection("messages"); // fetches the data from the collection "messages", this.referenceChatMessages will receive the data and updates of the database
+    this.referenceChatMessagesUser = null;
   }
 
   componentDidMount() {
@@ -40,34 +42,38 @@ export default class Chat extends React.Component {
 
     this.props.navigation.setOptions({ title: "Hi " + name });
 
+    //creating a references to messages collection- brings the data from the collection "messages", this.referenceChatMessages will receive the data and database updates
     this.referenceChatMessages = firebase.firestore().collection("messages");
 
-    this.unsubscribe = this.referenceChatMessages
-      .orderBy("createdAt", "desc")
-      .onSnapshot(this.onCollectionUpdate);
-    // this.setState({
-    //   messages: [
-    //     {
-    //       _id: 1,
-    //       text: "Hello developer ",
-    //       createdAt: new Date(),
-    //       user: {
-    //         _id: 2,
-    //         name: "React Native",
-    //         avatar: "https://placeimg.com/140/140/any",
-    //       },
-    //     },
-    //     {
-    //       _id: 2,
-    //       text: "This is a system message",
-    //       createdAt: new Date(),
-    //       system: true,
-    //     },
-    //   ],
-    // });
+    // listen to authentication events
+    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        await firebase.auth().signInAnonymously();
+      }
+      //update user state with currently active user data
+      this.setState({
+        uid: user.uid,
+        loggedInText: "Hello there",
+      });
+
+      // create a reference to the active user's documents (shopping lists)
+      this.referenceChatMessagesUser = firebase
+        .firestore()
+        .collection("messages")
+        .where("uid", "==", this.state.uid);
+      // listen for collection changes for current user
+
+      this.unsubscribe = this.referenceChatMessages
+        //orderBy sort the documents (messages) by date
+        .orderBy("createdAt", "desc")
+        .onSnapshot(this.onCollectionUpdate);
+    });
   }
 
   componentWillUnmount() {
+    // stop listening to authentication
+    this.authUnsubscribe();
+    // stop listening for changes
     this.unsubscribe();
   }
 
@@ -84,7 +90,6 @@ export default class Chat extends React.Component {
         system: data.system,
         createdAt: data.createdAt.toDate(),
       });
-      console.log(data.createdAt);
     });
     this.setState({
       messages,
@@ -126,14 +131,7 @@ export default class Chat extends React.Component {
         behavior={Platform.OS === "ios" ? null : null}
         style={{ flex: 1, justifyContent: "flex-end" }}
       >
-        {/* <FlatList
-          data={this.state.messages}
-          renderItem={({ item }) => (
-            <Text>
-              {item.createdAt}: {item.text}
-            </Text>
-          )}
-        /> */}
+        <Text>{this.state.loggedInText}</Text>
         <GiftedChat
           listViewProps={{
             style: {
