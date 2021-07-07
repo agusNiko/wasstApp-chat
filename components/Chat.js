@@ -32,7 +32,7 @@ export default class Chat extends React.Component {
       });
     }
 
-    this.referenceChatMessages = firebase.firestore().collection("messages"); // fetches the data from the collection "messages", this.referenceChatMessages will receive the data and updates of the database
+    //this.referenceChatMessages = firebase.firestore().collection("messages"); // fetches the data from the collection "messages", this.referenceChatMessages will receive the data and updates of the database
   }
 
   componentDidMount() {
@@ -41,9 +41,10 @@ export default class Chat extends React.Component {
     this.props.navigation.setOptions({ title: "Hi " + name });
 
     this.referenceChatMessages = firebase.firestore().collection("messages");
-    this.unsubscribe = this.referenceChatMessages.onSnapshot(
-      this.onCollectionUpdate
-    );
+
+    this.unsubscribe = this.referenceChatMessages
+      .orderBy("createdAt", "desc")
+      .onSnapshot(this.onCollectionUpdate);
     // this.setState({
     //   messages: [
     //     {
@@ -70,11 +71,6 @@ export default class Chat extends React.Component {
     this.unsubscribe();
   }
 
-  sendMessage() {
-    const message = this.state.messages[0];
-    this.referenceChatMessages.add(message);
-  }
-
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
     // go through each document
@@ -84,22 +80,29 @@ export default class Chat extends React.Component {
       messages.push({
         _id: data._id,
         text: data.text,
-        createdAt: data.createdAt.toDate(),
         user: data.user,
         system: data.system,
+        createdAt: data.createdAt.toDate(),
       });
+      console.log(data.createdAt);
     });
     this.setState({
       messages,
     });
   };
 
-  onSend(messages = []) {
-    // this.setState((previousState) => ({
-    //   messages: GiftedChat.append(previousState.messages, messages),
-    // }));
-
+  sendMessage(messages) {
     this.referenceChatMessages.add(messages[0]); // on send add the message[0] to the firebase then it automaticaly will be fetched
+  }
+  onSend(messages = []) {
+    this.setState(
+      (previousState) => ({
+        messages: GiftedChat.append(previousState.messages, messages),
+      }),
+      () => {
+        this.sendMessage(messages);
+      }
+    );
   }
 
   renderBubble(props) {
@@ -127,7 +130,7 @@ export default class Chat extends React.Component {
           data={this.state.messages}
           renderItem={({ item }) => (
             <Text>
-              {item._id}: {item.text}
+              {item.createdAt}: {item.text}
             </Text>
           )}
         /> */}
