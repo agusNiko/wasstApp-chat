@@ -6,12 +6,19 @@ import {
   Platform,
   Text,
   FlatList,
+  Button,
 } from "react-native";
 
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 
 import firebase from "firebase"; //import firebase to fetch the data from firebase Database
 import firestore from "firebase";
+
+//@react-native-community is giving me an error I Can't solve
+// import AsyncStorage from "@react-native-community/async-storage";
+
+//found this solution in https://stackoverflow.com/questions/56029007/nativemodule-asyncstorage-is-null-with-rnc-asyncstorage
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default class Chat extends React.Component {
   constructor(props) {
@@ -42,37 +49,77 @@ export default class Chat extends React.Component {
     this.referenceChatMessagesUser = null;
   }
 
-  componentDidMount() {
-    let name = this.props.route.params.name;
-
-    this.props.navigation.setOptions({ title: "Hi " + name });
-
-    //creating a references to messages collection- brings the data from the collection "messages", this.referenceChatMessages will receive the data and database updates
-    this.referenceChatMessages = firebase.firestore().collection("messages");
-
-    // listen to authentication events
-    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-      if (!user) {
-        await firebase.auth().signInAnonymously();
-      }
-      //update user state with currently active user data
+  // AsyncStorage code
+  //this function get messages locally stored using getItem asynchronously
+  async getMessages() {
+    let messages = "";
+    try {
+      messages = (await AsyncStorage.getItem("messages")) || [];
       this.setState({
-        uid: user.uid,
-        loggedInText: "Hello there",
+        messages: JSON.parse(messages),
       });
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
-      // create a reference to the active user's documents (shopping lists)
-      this.referenceChatMessagesUser = firebase
-        .firestore()
-        .collection("messages")
-        .where("uid", "==", this.state.uid);
-      // listen for collection changes for current user
+  //this function save messages locally using setItem asynchronously
+  async saveMessages() {
+    try {
+      await AsyncStorage.setItem(
+        "messages",
+        JSON.stringify(this.state.messages)
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
-      this.unsubscribe = this.referenceChatMessages
-        //orderBy sort the documents (messages) by date
-        .orderBy("createdAt", "desc")
-        .onSnapshot(this.onCollectionUpdate);
-    });
+  //this function delete messages locally using removeItem asynchronously
+  async deleteMessages() {
+    try {
+      await AsyncStorage.removeItem("messages");
+      this.setState({
+        messages: [],
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  componentDidMount() {
+    this.getMessages();
+
+    // let name = this.props.route.params.name;
+
+    // this.props.navigation.setOptions({ title: "Hi " + name });
+
+    // //creating a references to messages collection- brings the data from the collection "messages", this.referenceChatMessages will receive the data and database updates
+    // this.referenceChatMessages = firebase.firestore().collection("messages");
+
+    // // listen to authentication events
+    // this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+    //   if (!user) {
+    //     await firebase.auth().signInAnonymously();
+    //   }
+    //   //update user state with currently active user data
+    //   this.setState({
+    //     uid: user.uid,
+    //     loggedInText: "Hello there",
+    //   });
+
+    //   // create a reference to the active user's documents (shopping lists)
+    //   this.referenceChatMessagesUser = firebase
+    //     .firestore()
+    //     .collection("messages")
+    //     .where("uid", "==", this.state.uid);
+    //   // listen for collection changes for current user
+
+    //   this.unsubscribe = this.referenceChatMessages
+    //     //orderBy sort the documents (messages) by date
+    //     .orderBy("createdAt", "desc")
+    //     .onSnapshot(this.onCollectionUpdate);
+    // });
   }
 
   componentWillUnmount() {
@@ -104,13 +151,15 @@ export default class Chat extends React.Component {
   sendMessage(messages) {
     this.referenceChatMessages.add(messages[0]); // on send add the message[0] to the firebase then it automaticaly will be fetched
   }
+
   onSend(messages = []) {
     this.setState(
       (previousState) => ({
         messages: GiftedChat.append(previousState.messages, messages),
       }),
       () => {
-        this.sendMessage(messages);
+        //this.sendMessage(messages);
+        this.saveMessages(messages);
       }
     );
   }
@@ -137,6 +186,7 @@ export default class Chat extends React.Component {
         style={{ flex: 1, justifyContent: "flex-end" }}
       >
         <Text>{this.state.loggedInText}</Text>
+        <Button title="delete" onPress={() => this.deleteMessages()} />
         <GiftedChat
           listViewProps={{
             style: {
