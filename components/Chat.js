@@ -1,24 +1,17 @@
 import React from "react";
-import {
-  View,
-  ImageBackground,
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  FlatList,
-  Button,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, Text, Button } from "react-native";
 
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 
 import firebase from "firebase"; //import firebase to fetch the data from firebase Database
-import firestore from "firebase";
 
 //@react-native-community is giving me an error I Can't solve
 // import AsyncStorage from "@react-native-community/async-storage";
 
 //found this solution in https://stackoverflow.com/questions/56029007/nativemodule-asyncstorage-is-null-with-rnc-asyncstorage
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import NetInfo from "@react-native-community/netinfo";
 
 export default class Chat extends React.Component {
   constructor(props) {
@@ -32,6 +25,7 @@ export default class Chat extends React.Component {
       },
       uid: 0,
       loggedInText: "Please wait, you are getting logged in",
+      isConnected: false,
     };
     if (!firebase.apps.length) {
       // firebase credentials
@@ -88,45 +82,61 @@ export default class Chat extends React.Component {
   }
 
   componentDidMount() {
-    this.getMessages();
+    let name = this.props.route.params.name;
 
-    // let name = this.props.route.params.name;
+    this.props.navigation.setOptions({ title: "Hi " + name });
 
-    // this.props.navigation.setOptions({ title: "Hi " + name });
+    NetInfo.fetch().then((connection) => {
+      if (connection.isConnected) {
+        this.setState({ isConnected: true });
 
-    // //creating a references to messages collection- brings the data from the collection "messages", this.referenceChatMessages will receive the data and database updates
-    // this.referenceChatMessages = firebase.firestore().collection("messages");
+        //creating a references to messages collection- brings the data from the collection "messages", this.referenceChatMessages will receive the data and database updates
+        this.referenceChatMessages = firebase
+          .firestore()
+          .collection("messages");
 
-    // // listen to authentication events
-    // this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-    //   if (!user) {
-    //     await firebase.auth().signInAnonymously();
-    //   }
-    //   //update user state with currently active user data
-    //   this.setState({
-    //     uid: user.uid,
-    //     loggedInText: "Hello there",
-    //   });
+        // listen to authentication events
+        this.authUnsubscribe = firebase
+          .auth()
+          .onAuthStateChanged(async (user) => {
+            if (!user) {
+              await firebase.auth().signInAnonymously();
+            }
+            //update user state with currently active user data
+            this.setState({
+              uid: user.uid,
+              loggedInText: "Hello there",
+            });
 
-    //   // create a reference to the active user's documents (shopping lists)
-    //   this.referenceChatMessagesUser = firebase
-    //     .firestore()
-    //     .collection("messages")
-    //     .where("uid", "==", this.state.uid);
-    //   // listen for collection changes for current user
+            // create a reference to the active user's documents (shopping lists)
+            this.referenceChatMessagesUser = firebase
+              .firestore()
+              .collection("messages")
+              .where("uid", "==", this.state.uid);
+            // listen for collection changes for current user
 
-    //   this.unsubscribe = this.referenceChatMessages
-    //     //orderBy sort the documents (messages) by date
-    //     .orderBy("createdAt", "desc")
-    //     .onSnapshot(this.onCollectionUpdate);
-    // });
+            this.unsubscribe = this.referenceChatMessages
+              //orderBy sort the documents (messages) by date
+              .orderBy("createdAt", "desc")
+              .onSnapshot(this.onCollectionUpdate);
+          });
+      } else {
+        this.setState({
+          isConnected: false,
+          loggedInText: "No Internet Connection Detected",
+        });
+        this.getMessages();
+      }
+    });
   }
 
   componentWillUnmount() {
-    // stop listening to authentication
-    this.authUnsubscribe();
-    // stop listening for changes
-    this.unsubscribe();
+    if (this.state.isConnected) {
+      // stop listening to authentication
+      this.authUnsubscribe();
+      // stop listening for changes
+      this.unsubscribe();
+    }
   }
 
   onCollectionUpdate = (querySnapshot) => {
@@ -158,7 +168,9 @@ export default class Chat extends React.Component {
         messages: GiftedChat.append(previousState.messages, messages),
       }),
       () => {
-        //this.sendMessage(messages);
+        //save messages in firebase
+        this.sendMessage(messages);
+        //save message in local storage
         this.saveMessages(messages);
       }
     );
@@ -177,6 +189,14 @@ export default class Chat extends React.Component {
     );
   }
 
+  // disables message input bar if offline
+  renderInputToolbar = (props) => {
+    if (this.state.isConnected === false) {
+    } else {
+      return <InputToolbar {...props} />;
+    }
+  };
+
   render() {
     let chatColor = this.props.route.params.color;
 
@@ -194,6 +214,7 @@ export default class Chat extends React.Component {
             },
           }} // listVieProps allows me to change the color background of the GiftedChat
           renderBubble={this.renderBubble.bind(this)} //changes the color of the chat bubble
+          renderInputToolbar={this.renderInputToolbar}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
           user={{
