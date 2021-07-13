@@ -13,6 +13,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import NetInfo from "@react-native-community/netinfo";
 
+import CustomActions from "./CustomActions";
+
 export default class Chat extends React.Component {
   constructor(props) {
     super(props);
@@ -197,6 +199,11 @@ export default class Chat extends React.Component {
     }
   };
 
+  //
+  renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
+
   render() {
     let chatColor = this.props.route.params.color;
 
@@ -208,12 +215,14 @@ export default class Chat extends React.Component {
         <Text>{this.state.loggedInText}</Text>
         <Button title="delete" onPress={() => this.deleteMessages()} />
         <GiftedChat
+          // listVieProps allows me to change the color background of the GiftedChat
           listViewProps={{
             style: {
               backgroundColor: chatColor,
             },
-          }} // listVieProps allows me to change the color background of the GiftedChat
+          }}
           renderBubble={this.renderBubble.bind(this)} //changes the color of the chat bubble
+          //render inputbar if user is online
           renderInputToolbar={this.renderInputToolbar}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
@@ -222,6 +231,7 @@ export default class Chat extends React.Component {
             name: "pedro",
             avatar: "https://placeimg.com/140/140/any",
           }}
+          renderActions={this.renderCustomActions}
         />
       </KeyboardAvoidingView> // If I add a view in as a parent of the GiftedChat, this last does not render
     );
