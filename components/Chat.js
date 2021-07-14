@@ -1,8 +1,7 @@
 import React from "react";
 import { KeyboardAvoidingView, Platform, Text, Button } from "react-native";
-
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
-
+import MapView from "react-native-maps";
 import firebase from "firebase"; //import firebase to fetch the data from firebase Database
 
 //@react-native-community is giving me an error I Can't solve
@@ -21,13 +20,14 @@ export default class Chat extends React.Component {
     this.state = {
       messages: [],
       user: {
-        _id: "",
-        name: "",
-        avatar: "",
+        _id: 1,
+        name: "pedro",
+        avatar: "https://placeimg.com/140/140/any",
       },
       uid: 0,
       loggedInText: "Please wait, you are getting logged in",
       isConnected: false,
+      image: null,
     };
     if (!firebase.apps.length) {
       // firebase credentials
@@ -149,10 +149,11 @@ export default class Chat extends React.Component {
       let data = doc.data();
       messages.push({
         _id: data._id,
-        text: data.text,
-        user: data.user,
-        system: data.system,
+        text: data.text || "",
         createdAt: data.createdAt.toDate(),
+        user: data.user,
+        image: data.image || null,
+        location: data.location || null,
       });
     });
     this.setState({
@@ -161,7 +162,15 @@ export default class Chat extends React.Component {
   };
 
   sendMessage(messages) {
-    this.referenceChatMessages.add(messages[0]); // on send add the message[0] to the firebase then it automaticaly will be fetched
+    const message = this.state.messages[0];
+    this.referenceChatMessages.add({
+      _id: message._id,
+      text: message.text || "",
+      createdAt: message.createdAt,
+      user: message.user,
+      image: message.image || null,
+      location: message.location || null,
+    }); // on send add the message[0] to the firebase then it automaticaly will be fetched
   }
 
   onSend(messages = []) {
@@ -204,6 +213,25 @@ export default class Chat extends React.Component {
     return <CustomActions {...props} />;
   };
 
+  //custom map view
+  renderMapView(props) {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
+  }
+
   render() {
     let chatColor = this.props.route.params.color;
 
@@ -226,11 +254,8 @@ export default class Chat extends React.Component {
           renderInputToolbar={this.renderInputToolbar}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
-          user={{
-            _id: 1,
-            name: "pedro",
-            avatar: "https://placeimg.com/140/140/any",
-          }}
+          renderCustomView={this.renderMapView}
+          user={this.state.user}
           renderActions={this.renderCustomActions}
         />
       </KeyboardAvoidingView> // If I add a view in as a parent of the GiftedChat, this last does not render
