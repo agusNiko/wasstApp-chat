@@ -15,7 +15,7 @@ import Image from "./Background-Image.png"; //this is the way to import imgs to 
 export default class Start extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { name: "", color: "", activeColor: "colorButton1" };
+    this.state = { name: "", color: "", activeColor: "" };
   }
 
   render() {
