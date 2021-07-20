@@ -1,5 +1,11 @@
 import React from "react";
-import { KeyboardAvoidingView, Platform, Text, Button } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  Button,
+  TouchableOpacity,
+} from "react-native";
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import MapView from "react-native-maps";
 import firebase from "firebase"; //import firebase to fetch the data from firebase Database
@@ -159,6 +165,15 @@ export default class Chat extends React.Component {
     this.setState({
       messages,
     });
+    let text = messages[0].text;
+    if (text.includes("hi")) {
+      this.onSend({
+        user: {
+          _id: 0,
+        },
+        text: "where are you?",
+      });
+    }
   };
 
   sendMessage(messages) {
@@ -241,7 +256,10 @@ export default class Chat extends React.Component {
         style={{ flex: 1, justifyContent: "flex-end" }}
       >
         <Text>{this.state.loggedInText}</Text>
-        <Button title="delete" onPress={() => this.deleteMessages()} />
+        {/* <TouchableOpacity onPress={() => this.deleteMessages()}>
+          <Text>delete</Text>
+        </TouchableOpacity> */}
+
         <GiftedChat
           // listVieProps allows me to change the color background of the GiftedChat
           listViewProps={{
