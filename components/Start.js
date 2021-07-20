@@ -15,7 +15,7 @@ import Image from "./Background-Image.png"; //this is the way to import imgs to 
 export default class Start extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { name: "", color: "" };
+    this.state = { name: "", color: "", activeColor: "" };
   }
 
   render() {
@@ -93,7 +93,10 @@ export default class Start extends React.Component {
                 <View style={styles.backgroundColors}>
                   <View
                     style={{
-                      borderColor: "red",
+                      borderColor:
+                        this.state.activeColor === "colorButton1"
+                          ? "#090C08"
+                          : "white",
                       height: 55,
                       width: 55,
                       borderWidth: 3,
@@ -109,60 +112,124 @@ export default class Start extends React.Component {
                         width: 50,
                         borderRadius: 100,
                         borderWidth: 1,
+                        borderColor: "white",
                         backgroundColor: "#090C08",
+                        // outlineWidth: 1,
+                        // outlineStyle: "solid",
+                        // outlineColor: "#090C08",
                       }}
                       onPress={() => {
-                        this.setState({ color: "#090C08" });
+                        this.setState({
+                          color: "#090C08",
+                          activeColor: "colorButton1",
+                        });
                       }}
                     >
                       <View style={{ height: 50, width: 50 }} />
                     </TouchableOpacity>
                   </View>
-                  <TouchableOpacity
-                    className="colorButton2"
+                  <View
                     style={{
-                      height: 50,
-                      width: 50,
+                      borderColor:
+                        this.state.activeColor === "colorButton2"
+                          ? "#474056"
+                          : "white",
+                      height: 55,
+                      width: 55,
+                      borderWidth: 3,
                       borderRadius: 100,
-                      borderWidth: 1,
-                      backgroundColor: "#474056",
-                    }}
-                    onPress={() => {
-                      this.setState({ color: "#474056" });
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
-                    <View style={{ height: 50, width: 50 }} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="colorButton3"
+                    <TouchableOpacity
+                      className="colorButton2"
+                      style={{
+                        height: 50,
+                        width: 50,
+                        borderRadius: 100,
+                        borderWidth: 1,
+                        borderColor: "white",
+                        backgroundColor: "#474056",
+                      }}
+                      onPress={() => {
+                        this.setState({
+                          color: "#474056",
+                          activeColor: "colorButton2",
+                        });
+                      }}
+                    >
+                      <View style={{ height: 50, width: 50 }} />
+                    </TouchableOpacity>
+                  </View>
+                  <View
                     style={{
-                      height: 50,
-                      width: 50,
+                      borderColor:
+                        this.state.activeColor === "colorButton3"
+                          ? "#8A95A5"
+                          : "white",
+                      height: 55,
+                      width: 55,
+                      borderWidth: 3,
                       borderRadius: 100,
-
-                      backgroundColor: "#8A95A5",
-                    }}
-                    onPress={() => {
-                      this.setState({ color: "#8A95A5" });
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
-                    <View style={{ height: 50, width: 50 }} />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    className="colorButton4"
+                    <TouchableOpacity
+                      className="colorButton3"
+                      style={{
+                        height: 50,
+                        width: 50,
+                        borderWidth: 1,
+                        borderRadius: 100,
+                        borderColor: "white",
+                        backgroundColor: "#8A95A5",
+                      }}
+                      onPress={() => {
+                        this.setState({
+                          color: "#8A95A5",
+                          activeColor: "colorButton3",
+                        });
+                      }}
+                    >
+                      <View style={{ height: 50, width: 50 }} />
+                    </TouchableOpacity>
+                  </View>
+                  <View
                     style={{
-                      height: 50,
-                      width: 50,
+                      borderColor:
+                        this.state.activeColor === "colorButton4"
+                          ? "#B9C6AE"
+                          : "white",
+                      height: 55,
+                      width: 55,
+                      borderWidth: 3,
                       borderRadius: 100,
-
-                      backgroundColor: "#B9C6AE",
-                    }}
-                    onPress={() => {
-                      this.setState({ color: "#B9C6AE" });
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
-                    <View style={{ height: 50, width: 50 }} />
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      className="colorButton4"
+                      style={{
+                        height: 50,
+                        width: 50,
+                        borderWidth: 1,
+                        borderColor: "white",
+                        borderRadius: 100,
+                        backgroundColor: "#B9C6AE",
+                      }}
+                      onPress={() => {
+                        this.setState({
+                          color: "#B9C6AE",
+                          activeColor: "colorButton4",
+                        });
+                      }}
+                    >
+                      <View style={{ height: 50, width: 50 }} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
 
                 <Button
