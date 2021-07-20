@@ -83,6 +83,7 @@ export default class CustomActions extends React.Component {
       "Choose From Library",
       "Take Picture",
       "Send Location",
+      //"Delete Messages",
       "Cancel",
     ];
     const cancelButtonIndex = options.length - 1;
@@ -102,31 +103,57 @@ export default class CustomActions extends React.Component {
           case 2:
             console.log("user wants to get their location");
             return this.getLocation();
+          // case 3:
+          //   console.log("user wants to delete messages");
+          //   return this.props.deleteMessages;
+
           default:
         }
       }
     );
   };
 
+  //    Upload images to firebase
+  uploadImageFetch = async (uri) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    const imageNameBefore = uri.split("/");
+    const imageName = imageNameBefore[imageNameBefore.length - 1];
+
+    const ref = firebase.storage().ref().child(`images/${imageName}`);
+
+    const snapshot = await ref.put(blob);
+
+    blob.close();
+
+    return await snapshot.ref.getDownloadURL();
+  };
+
   render() {
     return (
-      <TouchableOpacity style={[styles.container]} onPress={this.onActionPress}>
+      <TouchableOpacity
+        accessible={true}
+        accessibilityLabel="More options"
+        accessibilityHint="Let’s you choose to send an image or your geolocation."
+        style={[styles.container]}
+        onPress={this.onActionPress}
+      >
         <View style={[styles.wrapper, this.props.wrapperStyle]}>
           <Text style={[styles.iconText, this.props.iconTextStyle]}>+</Text>
         </View>
       </TouchableOpacity>
-
-      //   <TouchableOpacity
-      //     className="CustomActions"
-      //     style={{
-      //       height: 50,
-      //       width: 50,
-      //       borderRadius: 100,
-      //     }}
-      //     onPress={() => this.onActionPress()}
-      //   >
-      //     <text style={{ height: 50, width: 50 }}>+</text>
-      //   </TouchableOpacity>
     );
   }
 }
