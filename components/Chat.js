@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Text,
-  Button,
-  TouchableOpacity,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, Text } from "react-native";
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import MapView from "react-native-maps";
 import firebase from "firebase"; //import firebase to fetch the data from firebase Database
@@ -114,6 +108,10 @@ export default class Chat extends React.Component {
             this.setState({
               uid: user.uid,
               loggedInText: "Hello there",
+              user: {
+                ...this.state.user,
+                _id: user.uid,
+              },
             });
 
             // create a reference to the active user's documents (shopping lists)
@@ -128,6 +126,15 @@ export default class Chat extends React.Component {
               .orderBy("createdAt", "desc")
               .onSnapshot(this.onCollectionUpdate);
           });
+        this.onSend({
+          user: {
+            _id: 2,
+            avatar: "https://placeimg.com/140/140/any",
+          },
+          text: "Hi developer",
+          _id: Math.random() * Math.pow(10, 18),
+          createdAt: new Date(),
+        });
       } else {
         this.setState({
           isConnected: false,
@@ -165,13 +172,18 @@ export default class Chat extends React.Component {
     this.setState({
       messages,
     });
-    let text = messages[0].text;
-    if (text.includes("hi")) {
+
+    // if user say Hi! system will ask where are you?
+    if (messages[0].text.includes("Hi!")) {
+      console.log("replying to hi");
       this.onSend({
         user: {
           _id: 0,
+          avatar: "https://placeimg.com/140/140/any",
         },
-        text: "where are you?",
+        text: "Hello! where are you?",
+        _id: Math.random() * Math.pow(10, 18),
+        createdAt: new Date(),
       });
     }
   };
@@ -225,7 +237,13 @@ export default class Chat extends React.Component {
 
   //
   renderCustomActions = (props) => {
-    return <CustomActions {...props} />;
+    let newProps = {
+      deleteMessages: () => {
+        this.deleteMessages();
+      },
+      ...props,
+    };
+    return <CustomActions {...newProps} />;
   };
 
   //custom map view
@@ -256,9 +274,6 @@ export default class Chat extends React.Component {
         style={{ flex: 1, justifyContent: "flex-end" }}
       >
         <Text>{this.state.loggedInText}</Text>
-        {/* <TouchableOpacity onPress={() => this.deleteMessages()}>
-          <Text>delete</Text>
-        </TouchableOpacity> */}
 
         <GiftedChat
           // listVieProps allows me to change the color background of the GiftedChat
