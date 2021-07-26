@@ -83,7 +83,7 @@ export default class CustomActions extends React.Component {
       "Choose From Library",
       "Take Picture",
       "Send Location",
-      //"Delete Messages",
+      "Delete Messages",
       "Cancel",
     ];
     const cancelButtonIndex = options.length - 1;
@@ -103,9 +103,9 @@ export default class CustomActions extends React.Component {
           case 2:
             console.log("user wants to get their location");
             return this.getLocation();
-          // case 3:
-          //   console.log("user wants to delete messages");
-          //   return this.props.deleteMessages;
+          case 3:
+            console.log("user wants to delete messages");
+            return this.props.deleteMessages();
 
           default:
         }
